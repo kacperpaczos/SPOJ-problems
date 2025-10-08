@@ -42,19 +42,36 @@ Wszystkie rozwiązania czytają dane ze standardowego wejścia i wypisują wynik
 Rozwiązania zawierają inteligentne optymalizacje dla konwersji między kompatybilnymi systemami pozycyjnymi:
 
 **Konwersje bezpośrednie (bez pośrednictwa systemu dziesiętnego):**
-- **Binarny (2)** ↔ **Czwórkowy (4)** ↔ **Ósemkowy (8)** ↔ **Szesnastkowy (16)**
-- Metoda: Grupowanie bitów (1→2→3→4 bity odpowiednio)
+
+Możliwe między podstawami będącymi potęgami tej samej liczby:
+- **Potęgi 2**: 2 ↔ 4 ↔ 8 ↔ 16 ↔ 32 ↔ ...
+- **Potęgi 3**: 3 ↔ 9 ↔ 27 ↔ 81 ↔ ...
+- **Potęgi 5**: 5 ↔ 25 ↔ 125 ↔ ...
+- **Ogólnie**: jeśli base₁ = r^n i base₂ = r^m, można konwertować bezpośrednio
+
+**Metoda wykrywania:**
+```python
+def get_base_root(base):
+    # Znajduje najmniejszą liczbę r taką, że base = r^n
+    # Np: 16 → (2, 4), 9 → (3, 2), 25 → (5, 2)
+    
+def can_convert_directly(base1, base2):
+    # Sprawdza czy obie podstawy mają ten sam root
+    # Np: 8 i 16 → TAK (oba są potęgami 2)
+    #     8 i 9  → NIE (2^3 vs 3^2)
+```
 
 **Konwersje standardowe (przez system dziesiętny):**
-- Wszystkie inne podstawy (np. base 11)
+- Wszystkie inne podstawy (np. base 11, 13, 7)
 
 **Przykład optymalizacji:**
 ```
-255₁₀ → FF₁₆:
-  255₁₀ = 11111111₂ (binarnie)
-  Grupowanie po 4 bity: 1111 1111
-  1111₂ = F₁₆, 1111₂ = F₁₆
-  Wynik: FF₁₆
+Konwersja 100₁₀:
+  → Base 16 (2^4): 64  ✓ optymalizacja (grupowanie po 4 bity)
+  → Base 9  (3^2): 121 ✓ optymalizacja (grupowanie po 2 "trity")
+  → Base 11:       91  ✗ standardowa konwersja
 ```
 
-Uruchom `python3 demo_optimizations.py` aby zobaczyć demonstrację optymalizacji.
+**Demonstracje:**
+- `python3 demo_optimizations.py` - optymalizacje dla potęg 2
+- `python3 demo_general_conversion.py` - ogólne konwersje (2,3,5,...)
