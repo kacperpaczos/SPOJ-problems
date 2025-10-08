@@ -1,12 +1,28 @@
 #!/usr/bin/env python3
-"""SPOJ TABLICA problem solution in Python.
+"""
+SPOJ: TABLICA – Reverse array problem
 
-This program reads a sequence of integers from stdin and outputs them in reverse order.
-Uses advanced Python features like list comprehensions and string slicing for minimal code.
+Reads a sequence of integers from stdin and outputs them in reverse order.
 """
 
 import sys
 
-# Read all numbers from stdin, split by spaces, convert to integers, and reverse order
-numbers = list(map(int, sys.stdin.read().split()))
-print(' '.join(map(str, numbers[::-1])))
+
+def main() -> None:
+    """Main function to read, process, and output reversed numbers."""
+    try:
+        data = sys.stdin.read().strip()
+        if not data:
+            return  # No input data – nothing to output
+
+        numbers = [int(x) for x in data.split()]
+        reversed_numbers = map(str, reversed(numbers))
+        print(' '.join(reversed_numbers))
+    except ValueError:
+        # If input contains non-integer values
+        sys.stderr.write("Error: Input must contain only integers.\n")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
