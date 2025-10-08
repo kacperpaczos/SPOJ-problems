@@ -36,3 +36,25 @@ Rozwiązania zostały zaimplementowane w trzech językach programowania:
 - **Java**: `solutions/SYS.java`
 
 Wszystkie rozwiązania czytają dane ze standardowego wejścia i wypisują wyniki na standardowe wyjście.
+
+### 🔁 Optymalizacje konwersji
+
+Rozwiązania zawierają inteligentne optymalizacje dla konwersji między kompatybilnymi systemami pozycyjnymi:
+
+**Konwersje bezpośrednie (bez pośrednictwa systemu dziesiętnego):**
+- **Binarny (2)** ↔ **Czwórkowy (4)** ↔ **Ósemkowy (8)** ↔ **Szesnastkowy (16)**
+- Metoda: Grupowanie bitów (1→2→3→4 bity odpowiednio)
+
+**Konwersje standardowe (przez system dziesiętny):**
+- Wszystkie inne podstawy (np. base 11)
+
+**Przykład optymalizacji:**
+```
+255₁₀ → FF₁₆:
+  255₁₀ = 11111111₂ (binarnie)
+  Grupowanie po 4 bity: 1111 1111
+  1111₂ = F₁₆, 1111₂ = F₁₆
+  Wynik: FF₁₆
+```
+
+Uruchom `python3 demo_optimizations.py` aby zobaczyć demonstrację optymalizacji.
