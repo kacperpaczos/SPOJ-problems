@@ -1,72 +1,80 @@
 import java.util.Scanner;
 
 public class SYS {
-    public static boolean isPowerOfTwoBase(int base) {
-        // Sprawdź czy podstawa jest potęgą dwójki (2, 4, 8, 16, 32, ...)
-        return base > 1 && (base & (base - 1)) == 0;
+    // Zwraca (root, exponent) dla base = root^exponent; jeśli nie jest potęgą jednej liczby pierwszej: (base, 1)
+    public static int[] getBaseRoot(int base) {
+        if (base <= 1) return new int[]{base, 1};
+
+        int firstFactor = 0;
+        int exponent = 0;
+        int n = base;
+
+        if ((n % 2) == 0) {
+            firstFactor = 2;
+            while ((n % 2) == 0) {
+                exponent++;
+                n /= 2;
+            }
+        }
+
+        if (firstFactor != 0 && n > 1) return new int[]{base, 1};
+
+        if (firstFactor == 0) {
+            int d = 3;
+            while ((long)d * d <= n) {
+                if ((n % d) == 0) {
+                    firstFactor = d;
+                    while ((n % d) == 0) {
+                        exponent++;
+                        n /= d;
+                    }
+                    break;
+                }
+                d += 2;
+            }
+        }
+
+        if (n > 1) {
+            if (firstFactor != 0) return new int[]{base, 1};
+            return new int[]{n, 1};
+        }
+
+        return new int[]{ firstFactor != 0 ? firstFactor : base, exponent > 0 ? exponent : 1 };
     }
 
-    public static int countBitsPerDigit(int base) {
-        // Oblicz ile bitów reprezentuje jedna cyfra w danej podstawie
-        // base = 2^bits → bits = log2(base)
-        int bits = 0;
-        int temp = base;
-        while (temp > 1) {
-            temp >>= 1;
-            bits++;
-        }
-        return bits;
+    private static char digitToChar(int digit) {
+        return (char)(digit < 10 ? ('0' + digit) : ('A' + digit - 10));
     }
 
     public static String toBaseN(long num, int base) {
-        if (num == 0) {
-            return "0";
-        }
+        if (num == 0) return "0";
 
-        // Optymalizacja: dla potęg dwójki używamy grupowania bitów
-        if (isPowerOfTwoBase(base)) {
-            // Oblicz ile bitów reprezentuje jedna cyfra
-            int bitsPerDigit = countBitsPerDigit(base);
-            
-            // Konwertuj do binarnego
-            StringBuilder binary = new StringBuilder();
-            long temp = num;
-            while (temp > 0) {
-                binary.insert(0, (temp % 2));
-                temp /= 2;
-            }
-            String binaryStr = binary.toString();
-            
-            // Dopełnij zerami do wielokrotności bitsPerDigit
-            int padding = (bitsPerDigit - binaryStr.length() % bitsPerDigit) % bitsPerDigit;
-            String paddedBinary = "0".repeat(padding) + binaryStr;
-            
-            // Grupuj bity i konwertuj każdą grupę na cyfrę
+        int[] rootExp = getBaseRoot(base);
+        int root = rootExp[0];
+        int exp = rootExp[1];
+
+        // Optymalizacja: potęgi 2 → operacje bitowe
+        if (root == 2 && exp > 1) {
+            int bitsPerDigit = exp;
+            int mask = (1 << bitsPerDigit) - 1;
             StringBuilder result = new StringBuilder();
-            for (int i = 0; i < paddedBinary.length(); i += bitsPerDigit) {
-                String group = paddedBinary.substring(i, i + bitsPerDigit);
-                int groupVal = Integer.parseInt(group, 2);
-                if (groupVal < 10) {
-                    result.append(groupVal);
-                } else {
-                    result.append((char)('A' + groupVal - 10));
-                }
+            long n = num;
+            while (n > 0) {
+                int groupVal = (int)(n & mask);
+                result.append(digitToChar(groupVal));
+                n >>= bitsPerDigit;
             }
-            return result.toString();
+            return result.reverse().toString();
         }
 
-        // Standardowa konwersja dla innych podstaw
+        // Standardowa konwersja
         StringBuilder result = new StringBuilder();
-        while (num > 0) {
-            int remainder = (int)(num % base);
-            if (remainder < 10) {
-                result.append(remainder);
-            } else {
-                result.append((char)('A' + remainder - 10));
-            }
-            num /= base;
+        long n = num;
+        while (n > 0) {
+            int remainder = (int)(n % base);
+            result.append(digitToChar(remainder));
+            n /= base;
         }
-
         return result.reverse().toString();
     }
 
